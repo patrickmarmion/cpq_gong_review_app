@@ -2,18 +2,21 @@
   "name": "gong_review",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "node test.js",
     "start": "node app.js"
   },
   "author": "",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }

@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 require('dotenv').config({ path: ".env" });
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
