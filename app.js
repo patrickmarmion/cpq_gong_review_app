@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require("axios");
 require('dotenv').config();
 
 const authenticateReq = require('./Authentication/authenticate');
@@ -12,25 +13,28 @@ app.use(express.json());
 
 app.post('/recordingHandler', authenticateReq, async (req, res) => {
     try {
-        const { messageText, channelId, channelName } = req.body;
+        const { messageText, channelId, channelName, callbackUrl } = req.body;
 
-        // Validate the required fields
-        if (!messageText || !channelId || !channelName) {
-            return res.status(400).json({ error: "Invalid request. Required fields: messageText, channelId, channelName" });
-        };
+        if (!messageText || !channelId || !channelName || !callbackUrl) {
+            return res.status(400).json({ error: "Invalid request. Required fields: messageText, channelId, channelName, callbackUrl" });
+        }
+
+        // Respond immediately to prevent Zapier timeout
+        res.status(202).json({ message: "Request received. Processing in background..." });
 
         const callTranscript = await handleGongCall(messageText);
-        const geminiResponse = await processQuestions(callTranscript);
+        const geminiResponses = await processQuestions(callTranscript);
+        const slackFormattedResponse = geminiResponses
+            .map(({ question, answer }) => `*${question}*\n• _${answer}_`)
+            .join("\n\n");
 
-        res.json({
-            gemini_response: geminiResponse
-        });
+        // Send result back to client via callback URL
+        await axios.post(callbackUrl, { gemini_response: slackFormattedResponse });
+
     } catch (error) {
         console.error("Error in /recordingHandler:", error);
-        res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
 
 app.listen(PORT, (error) => {
     if (!error)
