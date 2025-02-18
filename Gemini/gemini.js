@@ -7,10 +7,9 @@ const questions = [
     "What CRM does the customer use?", 
     "CRM central object/table name where your Quotes are created from? Opportunity, Deal, other",
     "Where do you store your pricebook? In your CRM or is there also a spreadsheet?",
-    "Roughly how many SKUs or Products are in your catalog or that you manage",
-    "What is your biggest pain point?", 
+    //"Roughly how many SKUs or Products are in your catalog or that you manage",
+    //"What is your biggest pain point?", 
 ];
-const responseConfidence = "Please try to make your asnwers concise. If based on the data provided, you cannot determine the answer please output: insufficient data";
 
 const askGemini = async (callTranscript, question) => {
     const model = genAI.getGenerativeModel({
@@ -18,15 +17,15 @@ const askGemini = async (callTranscript, question) => {
     });
 
     const prompt = `
-        Here's some data about customer conversations:
-
         \`\`\`json
         ${JSON.stringify(callTranscript, null, 2)}
         \`\`\`
 
+        Above is a call recording transcript between PandaDoc and a potential customer. The PandaDoc representative(s) are trying to determine how the other company configures their quoting/pricing
         Based on this data, answer the following question:
 
         ${question}
+        Please try to make your asnwers concise. If based on the data provided, you cannot determine the answer please output: insufficient data
         `;
 
     try {
@@ -54,7 +53,7 @@ const askGemini = async (callTranscript, question) => {
 const processQuestions = async (callTranscript) => {
     const geminiResponses = [];
     for (const question of questions) {
-        const answer = await askGemini(callTranscript, `${question} ${responseConfidence}`);
+        const answer = await askGemini(callTranscript, question);
         geminiResponses.push({ question, answer });
     }
     return geminiResponses;
