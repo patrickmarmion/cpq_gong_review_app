@@ -22,8 +22,8 @@ app.post('/recordingHandler', authenticateReq, async (req, res) => {
         // Respond immediately to prevent Zapier timeout
         res.status(202).json({ message: "Request received. Processing in background..." });
 
-        const callTranscript = await handleGongCall(messageText);
-        const geminiResponses = await processQuestions(callTranscript);
+        const { speakers, transcript } = await handleGongCall(messageText);
+        const geminiResponses = await processQuestions(speakers, transcript);
         const slackFormattedResponse = geminiResponses
             .map(({ question, answer }) => `*${question}*\n• _${answer}_`)
             .join("\n\n");

@@ -11,21 +11,23 @@ const questions = [
     //"What is your biggest pain point?", 
 ];
 
-const askGemini = async (callTranscript, question) => {
+const askGemini = async (speakers, transcript, question) => {
     const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash"
     });
 
     const prompt = `
         \`\`\`json
-        ${JSON.stringify(callTranscript, null, 2)}
+        ${JSON.stringify(transcript, null, 2)}
         \`\`\`
 
         Above is a call recording transcript between PandaDoc and a potential customer. The PandaDoc representative(s) are trying to determine how the other company configures their quoting/pricing
+        PandaDoc Speaker Representative(s) speakerIds are: ${speakers.PandaSpeakers}
+        Customer Speaker Representative(s) speakerIds are: ${speakers.ExternalSpeakers}
         Based on this data, answer the following question:
 
         ${question}
-        Please try to make your asnwers concise. If based on the data provided, you cannot determine the answer please output: insufficient data
+        Please try to make your asnwers concise. If based on the data provided, you cannot determine the answer please output: Insufficient data
         `;
 
     try {
@@ -50,10 +52,10 @@ const askGemini = async (callTranscript, question) => {
     }
 };
 
-const processQuestions = async (callTranscript) => {
+const processQuestions = async (speakers, transcript) => {
     const geminiResponses = [];
     for (const question of questions) {
-        const answer = await askGemini(callTranscript, question);
+        const answer = await askGemini(speakers, transcript, question);
         geminiResponses.push({ question, answer });
     }
     return geminiResponses;
