@@ -24,6 +24,7 @@ const askGemini = async (speakers, transcript, question) => {
         Above is a call recording transcript between PandaDoc and a potential customer. The PandaDoc representative(s) are trying to determine how the other company configures their quoting/pricing
         PandaDoc Speaker Representative(s) speakerIds are: ${speakers.PandaSpeakers}
         Customer Speaker Representative(s) speakerIds are: ${speakers.ExternalSpeakers}
+        There could be other speaker Ids which have not been able to categorise.
         Based on this data, answer the following question:
 
         ${question}

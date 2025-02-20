@@ -1,9 +1,13 @@
 require('dotenv').config();
 const axios = require("axios");
+const base64Credentials = Buffer.from(`${process.env.GONG_API_KEY}:${process.env.GONG_API_SECRET}`).toString("base64");
 const headers = {
-    'Content-Type': 'application/json',
-    Authorization: `Basic ${process.env.GONG_API_KEY}`
+    headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${base64Credentials}`
+    }
 };
+const baseUrl = process.env.GONG_BASE_URL;
 
 const extractGongUrl = (messageText) => {
     const urlRegex = /(https?:\/\/[^\s]+)/;
@@ -23,7 +27,7 @@ const retrieveSpeakerIds = async (id) => {
             ]
         }
     };
-    const { calls } = await axios.post("/v2/calls/extensive", JSON.stringify(body), headers);
+    const { calls } = await axios.post(`${baseUrl}/v2/calls/extensive`, JSON.stringify(body), headers);
     const PandaSpeakers = calls[0].parties
         .filter(party => party.affiliation === "Internal")
         .map(speaker => speaker.speakerId);
@@ -46,19 +50,19 @@ const retrieveTranscript = async (id) => {
             ]
         }
     };
-    const retrieveTranscript = await axios.post("/v2/calls/transcript", JSON.stringify(body), headers);
-    const transcript = retrieveTranscript.callTranscripts[0].transcript;
+    const { data } = await axios.post(`${baseUrl}/v2/calls/transcript`, body, headers);
+    const transcript = data.callTranscripts[0].transcript.filter(obj => obj.topic !== "Call Setup" && obj.topic !== "Small Talk" && obj.topic !== "Wrap-up");
     return transcript
 };
 
 const handleGongCall = async (messageText) => {
     const gongURL = extractGongUrl(messageText);
-    const id = gongURL.split("?id=");
+    const id = gongURL.split("?id=")[1];
+    const transcript = await retrieveTranscript(id);
 
     //THIS NEEDS TO BE TESTED
     /*
     const speakers = await retrieveSpeakerIds(id);
-    const transcript = await retrieveTranscript(id);
     return {
         speakers,
         transcript
@@ -67,28 +71,10 @@ const handleGongCall = async (messageText) => {
 
     return {
         speakers: {
-            "PandaSpeakers": ["123"],
-            "ExternalSpeakers": ["456"]
+            "PandaSpeakers": ["6496595035999914885"],
+            "ExternalSpeakers": ["1615404021306669752", "5049046312312437272"]
         },
-        transcript: [{
-                "speakerId": "123",
-                "topic": "CPQ",
-                "sentences": [{
-                    "start": 460230,
-                    "end": 462343,
-                    "text": "What is the name of your CRM Name?"
-                }]
-            },
-            {
-                "speakerId": "456",
-                "topic": "CPQ",
-                "sentences": [{
-                    "start": 462344,
-                    "end": 465343,
-                    "text": "We use HubSpot CRM and generate documents from the Deal"
-                }]
-            }
-        ]
+        transcript
     }
 };
 
