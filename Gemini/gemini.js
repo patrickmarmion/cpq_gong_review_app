@@ -5,10 +5,10 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const questions = [
     "What CRM does the customer use?", 
-    "CRM central object/table name where your Quotes are created from? Opportunity, Deal, other",
-    "Where do you store your pricebook? In your CRM or is there also a spreadsheet?",
-    //"Roughly how many SKUs or Products are in your catalog or that you manage",
-    //"What is your biggest pain point?", 
+    "CRM central object/table name where the customer's Quotes are created from? Opportunity, Deal, other",
+    "Where does the customer store their pricebook? In their CRM or is there also a spreadsheet?",
+    "Roughly how many SKUs or Products are in the customer's catalog or that they manage",
+    "What is the customer's biggest pain point?", 
 ];
 
 const askGemini = async (speakers, transcript, question) => {

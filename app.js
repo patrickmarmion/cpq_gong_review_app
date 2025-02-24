@@ -21,6 +21,7 @@ app.post('/recordingHandler', authenticateReq, async (req, res) => {
 
         // Respond immediately to prevent Zapier timeout
         res.status(202).json({ message: "Request received. Processing in background..." });
+        console.log("Processing Gong Call");
 
         const { speakers, transcript } = await handleGongCall(messageText);
         const geminiResponses = await processQuestions(speakers, transcript);
