@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: ".env" });
 const axios = require("axios");
 const base64Credentials = Buffer.from(`${process.env.GONG_API_KEY}:${process.env.GONG_API_SECRET}`).toString("base64");
 const headers = {
